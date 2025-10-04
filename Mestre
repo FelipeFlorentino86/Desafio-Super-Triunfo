@@ -1,0 +1,100 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+
+typedef struct {
+    char estado[50];
+    char codigo[10];
+    char cidade[50];
+    unsigned long int populacao;
+    float area;
+    float pib; // em bilhões
+    int pontosTuristicos;
+    float densidade;    
+    float pibPerCapita; 
+    float superPoder;   
+} Carta;
+
+// Lista de estados brasileiros
+const char* estadosBrasileiros[] = {
+    "Acre","Alagoas","Amapa","Amazonas","Bahia","Ceara","Distrito Federal",
+    "Espirito Santo","Goias","Maranhao","Mato Grosso","Mato Grosso do Sul",
+    "Minas Gerais","Para","Paraiba","Parana","Pernambuco","Piaui","Rio de Janeiro",
+    "Rio Grande do Norte","Rio Grande do Sul","Rondonia","Roraima","Santa Catarina",
+    "Sao Paulo","Sergipe","Tocantins"
+};
+const int numEstados = 27;
+
+// Função para gerar carta aleatória
+void gerarCartaAleatoria(Carta *carta, int numero) {
+    // Estado aleatório
+    int indiceEstado = rand() % numEstados;
+    sprintf(carta->estado, "%s", estadosBrasileiros[indiceEstado]);
+
+    // Cidade e código
+    sprintf(carta->cidade, "Cidade%d", numero);
+    sprintf(carta->codigo, "C%02d", numero);
+
+    // Valores numéricos aleatórios
+    carta->populacao = (rand() % 9000000 + 1000000); // 1M a 10M
+    carta->area = (float)(rand() % 5000 + 100);       // 100 a 5100 km²
+    carta->pib = (float)(rand() % 500 + 50);          // 50 a 550 bilhões
+    carta->pontosTuristicos = rand() % 100;           // 0 a 99 pontos
+
+    // Cálculos
+    carta->densidade = carta->populacao / carta->area;
+    carta->pibPerCapita = (carta->pib * 1e9) / carta->populacao;
+}
+
+// Calcular Super Poder
+void calcularSuperPoder(Carta *carta) {
+    carta->superPoder = (float)carta->populacao + carta->area + carta->pib +
+                         carta->pontosTuristicos + carta->pibPerCapita + (1.0f / carta->densidade);
+}
+
+// Comparar cartas
+void compararCartas(Carta c1, Carta c2) {
+    printf("\n==== Resultados da Batalha ====\n");
+    printf("Populacao: %s vence\n", c1.populacao > c2.populacao ? c1.cidade : c2.cidade);
+    printf("Area: %s vence\n", c1.area > c2.area ? c1.cidade : c2.cidade);
+    printf("PIB: %s vence\n", c1.pib > c2.pib ? c1.cidade : c2.cidade);
+    printf("Pontos Turisticos: %s vence\n", c1.pontosTuristicos > c2.pontosTuristicos ? c1.cidade : c2.cidade);
+    printf("Densidade Populacional (menor vence): %s vence\n", c1.densidade < c2.densidade ? c1.cidade : c2.cidade);
+    printf("PIB per Capita: %s vence\n", c1.pibPerCapita > c2.pibPerCapita ? c1.cidade : c2.cidade);
+    printf("Super Poder: %s vence\n", c1.superPoder > c2.superPoder ? c1.cidade : c2.cidade);
+
+    printf("\n==== **** Carta Campea Geral ***** ====\n");
+    if (c1.superPoder > c2.superPoder) {
+        printf("A campea e: %s\n", c1.cidade);
+    } else if (c2.superPoder > c1.superPoder) {
+        printf("A campea e: %s\n", c2.cidade);
+    } else {
+        printf("Empate no Super Poder!\n");
+    }
+}
+
+int main() {
+    srand(time(NULL)); // Inicializa a semente aleatória
+
+    Carta carta1, carta2;
+
+    // Gerar cartas aleatórias
+    gerarCartaAleatoria(&carta1, 1);
+    calcularSuperPoder(&carta1);
+    gerarCartaAleatoria(&carta2, 2);
+    calcularSuperPoder(&carta2);
+
+    // Exibir dados das cartas
+    printf("==== Carta 1 ====\n");
+    printf("Cidade: %s, Estado: %s, Pop: %lu, Area: %.2f km2, PIB: %.2f bi, Pontos: %d\n",
+           carta1.cidade, carta1.estado, carta1.populacao, carta1.area, carta1.pib, carta1.pontosTuristicos);
+
+    printf("\n==== Carta 2 ====\n");
+    printf("Cidade: %s, Estado: %s, Pop: %lu, Area: %.2f km2, PIB: %.2f bi, Pontos: %d\n",
+           carta2.cidade, carta2.estado, carta2.populacao, carta2.area, carta2.pib, carta2.pontosTuristicos);
+
+    // Comparar cartas
+    compararCartas(carta1, carta2);
+
+    return 0;
+}
